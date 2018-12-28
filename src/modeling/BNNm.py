@@ -47,7 +47,7 @@ class BNNm(object):
 
         # We will use an interactive session.
         # sess = tf.InteractiveSession()
-        # Initialise all the vairables in the session.
+        # Initialise all the variables in the session.
         tf.global_variables_initializer().run()
 
     def __load_test_data__(self):
@@ -105,7 +105,7 @@ class BNNm(object):
     def plot_accuracy(self):
         # Compute the accuracy of the model.
         # For each sample we compute the predicted class and compare with the test labels.
-        # Predicted class is defined as the one which as maximum proability.
+        # Predicted class is defined as the one which as maximum probability.
         # We perform this test for each (w,b) in the posterior giving us a set of accuracies
         # Finally we make a histogram of accuracies for the test data.
         accuracy_test = []
