@@ -12,9 +12,9 @@ from sklearn.datasets import make_moons
 K = 2
 D = 2
 BATCH_SIZE = 100
-N_TRAIN = 100
-N_TEST = 100
 STEPS = 1000
+N_TRAIN = STEPS * BATCH_SIZE
+N_TEST = 100
 number_of_samples = 100
 
 # Tensorflow Placeholders:
@@ -36,9 +36,6 @@ inference.initialize(n_iter=STEPS, n_print=10, scale={y: N_TRAIN / BATCH_SIZE})
 sess = tf.InteractiveSession()
 tf.global_variables_initializer().run()
 
-# train_data_generator, train_labs_generator = make_moons(noise=0.3, n_samples=BATCH_SIZE)
-# train_data_generator = iter(train_data_generator)
-# train_labs_generator = iter(train_labs_generator)
 for _ in range(inference.n_iter):
     train_data_generator, train_labs_generator = make_moons(noise=0.3, n_samples=BATCH_SIZE)
     X_batch = train_data_generator
@@ -60,7 +57,7 @@ for _ in range(number_of_samples):
     b_samples.append(b_samp)
 
     # Probability of each class for each sample.
-    prob = tf.nn.softmax(tf.matmul(X_test, w_samp) + b_samp)
+    prob = tf.nn.sigmoid(tf.matmul(X_test, w_samp) + b_samp)
     prob_lst.append(prob.eval())
     sample = tf.concat([tf.reshape(w_samp, [-1]), b_samp], 0)
     samples.append(sample.eval())
