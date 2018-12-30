@@ -16,7 +16,7 @@ class BNNm(object):
         self.data = dataset
 
         # Create a placeholder to hold the data (in mini batches).
-        self.x = tf.placeholder(tf.float32, [None, self.D])
+        self.x = tf.placeholder(tf.float32, [self.N, self.D])
 
         # Normal(0,1) priors for the variables.
         self.w = Normal(loc=tf.zeros([self.D, self.K]), scale=tf.ones([self.D, self.K]))
