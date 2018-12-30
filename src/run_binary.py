@@ -12,7 +12,7 @@ class Binary(object):
     @staticmethod
     def run():
         dataset = Reader.read(Type.BINARY)
-        print("\n\n")
+        print("\n")
 
         batch_size = 100
         number_of_features = 2
@@ -24,16 +24,17 @@ class Binary(object):
 
         model = BNNb(batch_size, number_of_features, number_of_classes, dataset)
 
-        print("Train and evaluation " + str(samples_1) + " sample(s)\n")
+        print("Train ... \n")
         model.train(iterations)
+        print("\n\nEvaluation " + str(samples_1) + " sample(s)\n")
         model.evaluating(samples_1)
         model.plot_accuracy()
         model.plot_w()
 
-        print("\n\n")
+        print("\n")
 
-        print("Train and evaluation " + str(samples_2) + " sample(s)\n")
-        model.train(iterations)
+        print("Evaluation " + str(samples_2) + " sample(s)\n")
+        # model.train(iterations)
         model.evaluating(samples_2)
         model.plot_accuracy()
         model.plot_w()
