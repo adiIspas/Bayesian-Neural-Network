@@ -12,9 +12,9 @@ class MultiClass(object):
     @staticmethod
     def run():
         dataset = Reader.read(Type.MULTI_CLASS)
-        print("\n\n")
+        print("\n")
 
-        mini_batch_size = 100
+        batch_size = 100
         number_of_features = 784
         number_of_classes = 10
 
@@ -22,10 +22,11 @@ class MultiClass(object):
         samples_1 = 100
         samples_2 = 1
 
-        model = BNNm(mini_batch_size, number_of_features, number_of_classes, dataset)
+        model = BNNm(batch_size, number_of_features, number_of_classes, dataset)
 
-        print("Train ... \n")
+        print("Training ... \n")
         model.train(iterations)
+
         print("\n\nEvaluation " + str(samples_1) + " sample(s)\n")
         model.evaluating(samples_1)
         model.plot_accuracy()

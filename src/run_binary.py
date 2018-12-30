@@ -21,8 +21,9 @@ class Binary(object):
 
         model = BNNb(batch_size, number_of_features, number_of_classes)
 
-        print("Train ... \n")
+        print("Training ... \n")
         model.train(iterations)
+
         print("\n\nEvaluation " + str(samples_1) + " sample(s)\n")
         model.evaluating(samples_1)
         model.plot_accuracy()
