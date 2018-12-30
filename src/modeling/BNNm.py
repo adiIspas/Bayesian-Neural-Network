@@ -1,8 +1,8 @@
+import edward as ed
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 from edward.models import Categorical, Normal
-import edward as ed
 
 
 class BNNm(object):
@@ -43,11 +43,9 @@ class BNNm(object):
 
         config = tf.ConfigProto(log_device_placement=True)
         config.gpu_options.allow_growth = True
-        self.session = tf.Session(config=config)
 
-        # We will use an interactive session.
-        # sess = tf.InteractiveSession()
         # Initialise all the variables in the session.
+        self.session = tf.Session(config=config)
         tf.global_variables_initializer().run()
 
     def __load_test_data__(self):
