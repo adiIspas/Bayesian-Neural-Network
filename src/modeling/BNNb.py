@@ -3,13 +3,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 from edward.models import Bernoulli, Normal
-from sklearn.datasets import make_moons
+# from sklearn.datasets import make_moons
 from sklearn.metrics import accuracy_score
+
+from src.preparation.dataset_reader import Reader
 
 
 class BNNb(object):
 
-    def __init__(self, batch_size, number_of_features, number_of_classes, dataset):
+    def __init__(self, batch_size, number_of_features, number_of_classes):
         self.prob_lst = []
         self.w_values = []
         self.accuracy = []
@@ -63,14 +65,12 @@ class BNNb(object):
 
         # Let the training begin. We load the data in mini batches and update the VI inference using each new batch.
         for index in range(self.inference.n_iter):
-            x_batch, y_batch = make_moons(noise=self.noise, n_samples=self.N)
+            x_batch, y_batch = Reader.next_make_moons_batch(self.noise, self.N)
 
             info_dict = self.inference.update(feed_dict={self.x: x_batch, self.y_ph: y_batch})
             self.inference.print_progress(info_dict)
 
     def evaluating(self, number_of_samples):
-        # self.__load_test_data__()
-
         self.prob_lst = []
         self.w_values = []
         self.accuracy = []
@@ -80,7 +80,7 @@ class BNNb(object):
         b_samples = []
 
         for _ in range(n_samples):
-            x_test, y_test = make_moons(noise=self.noise, n_samples=self.N)
+            x_test, y_test = Reader.next_make_moons_batch(self.noise, self.N)
             x_test = tf.cast(x_test, tf.float32)
 
             w_samp = self.qw.sample()
@@ -97,10 +97,6 @@ class BNNb(object):
             y_pred[y_pred <= 0.5] = 0
             self.accuracy.append(accuracy_score(y_test, y_pred))
             self.prob_lst.append(prob.eval())
-
-            # self.prob_lst.append(prob.eval())
-            # sample = tf.concat([tf.reshape(w_samp, [-1]), b_samp], 0)
-            # samples.append(sample.eval())
 
         self.w_values = np.reshape(self.w_values, [1, -1])
 

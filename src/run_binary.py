@@ -1,8 +1,6 @@
 import os
 
 from src.modeling.BNNb import BNNb
-from src.preparation.clasification_type import Type
-from src.preparation.dataset_reader import Reader
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
@@ -11,7 +9,6 @@ class Binary(object):
 
     @staticmethod
     def run():
-        dataset = Reader.read(Type.BINARY)
         print("\n")
 
         batch_size = 100
@@ -22,7 +19,7 @@ class Binary(object):
         samples_1 = 100
         samples_2 = 1
 
-        model = BNNb(batch_size, number_of_features, number_of_classes, dataset)
+        model = BNNb(batch_size, number_of_features, number_of_classes)
 
         print("Train ... \n")
         model.train(iterations)
