@@ -13,7 +13,7 @@ class Reader(object):
 
     @staticmethod
     def read_multi_class():
-        return input_data.read_data_sets("data/raw", one_hot=True)
+        return input_data.read_data_sets("../data/raw", one_hot=True)
 
     @staticmethod
     def next_make_moons_batch(noise, batch_size):

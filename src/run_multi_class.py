@@ -11,6 +11,8 @@ class MultiClass(object):
 
     @staticmethod
     def run():
+        print("\n=== Multi class classification ===\n")
+
         dataset = Reader.read(Type.MULTI_CLASS)
         print("\n")
 

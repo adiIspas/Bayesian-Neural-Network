@@ -9,6 +9,7 @@ class Binary(object):
 
     @staticmethod
     def run():
+        print("\n=== Binary class classification ===\n")
         print("\n")
 
         batch_size = 100
