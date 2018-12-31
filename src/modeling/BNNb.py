@@ -84,7 +84,7 @@ class BNNb(object):
 
             self.accuracy.append(accuracy_score(y_test, y_pred))
 
-        self.w_values = np.reshape(self.w_values, [1, -1])
+        self.w_values = np.reshape(self.w_values, [-1])
 
         # Compute the mean of probabilities for each class for all the (w,b) samples.
         print("Accuracy in predicting the test data = ", np.mean(self.accuracy) * 100)
@@ -101,7 +101,7 @@ class BNNb(object):
 
     def plot_w(self):
         # Plot a histogram of W values for the test data.
-        plt.hist(self.w_values[0])
+        plt.hist(self.w_values)
 
         plt.title("Histogram of W[0] in the MNIST test data")
         plt.xlabel("W samples")
