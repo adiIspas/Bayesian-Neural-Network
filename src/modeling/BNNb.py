@@ -93,7 +93,7 @@ class BNNb(object):
         # Plot a histogram of accuracies for the test data.
         plt.hist(self.accuracy)
 
-        plt.title("Histogram of prediction accuracies in the MNIST test data")
+        plt.title("Histogram of prediction accuracies in the make moons test data")
         plt.xlabel("Accuracy")
         plt.ylabel("Frequency")
 
@@ -103,7 +103,7 @@ class BNNb(object):
         # Plot a histogram of W values for the test data.
         plt.hist(self.w_values)
 
-        plt.title("Histogram of W[0] in the MNIST test data")
+        plt.title("Histogram of W in the make moons test data")
         plt.xlabel("W samples")
         plt.ylabel("Frequency")
 

@@ -16,7 +16,7 @@ class Binary(object):
         number_of_features = 2
         number_of_classes = 2
 
-        iterations = 10000
+        iterations = 100000
         samples_1 = 100
         samples_2 = 1
 

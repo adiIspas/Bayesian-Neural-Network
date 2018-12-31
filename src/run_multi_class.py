@@ -20,7 +20,7 @@ class MultiClass(object):
         number_of_features = 784
         number_of_classes = 10
 
-        iterations = 10000
+        iterations = 100000
         samples_1 = 100
         samples_2 = 1
 

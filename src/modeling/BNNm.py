@@ -10,7 +10,6 @@ class BNNm(object):
     def __init__(self, batch_size, number_of_features, number_of_classes, dataset):
         self.probabilities = []
         self.w_values = []
-        self.accuracy = []
         self.N = batch_size
         self.D = number_of_features
         self.K = number_of_classes
@@ -74,7 +73,7 @@ class BNNm(object):
     def evaluating(self, number_of_samples):
         self.__load_test_data__()
         self.w_values = []
-        self.accuracy = []
+        self.probabilities = []
 
         for _ in range(number_of_samples):
             w_samp = self.qw.sample()
@@ -86,9 +85,6 @@ class BNNm(object):
             prob = tf.nn.softmax(tf.matmul(self.x_test, w_samp) + b_samp)
             self.probabilities.append(prob.eval())
 
-            y_pred = np.argmax(prob, axis=0).astype(np.float32)
-            self.accuracy.append((y_pred == self.y_test).mean() * 100)
-
         self.w_values = np.reshape(self.w_values, [-1])
 
         # Compute the mean of probabilities for each class for all the (w,b) samples.
@@ -96,8 +92,14 @@ class BNNm(object):
         print("Accuracy in predicting the test data = ", (y_pred == self.y_test).mean() * 100)
 
     def plot_accuracy(self):
-        # Plot a histogram of accuracies for the test data.
-        plt.hist(self.accuracy)
+        # Compute the accuracy of the model.
+        accuracy_test = []
+        for prob in self.probabilities:
+            y_pred = np.argmax(prob, axis=1).astype(np.float32)
+            accuracy = (y_pred == self.y_test).mean() * 100
+            accuracy_test.append(accuracy)
+
+        plt.hist(accuracy_test)
 
         plt.title("Histogram of prediction accuracies in the MNIST test data")
         plt.xlabel("Accuracy")
