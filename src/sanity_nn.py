@@ -2,19 +2,24 @@ import numpy as np
 import pymc as pm
 from matplotlib import pyplot as plt
 
-# def generate_data(size):
-#     X = np.random.randn(size, 2)
-#     Y = np.tanh(X_train[:, 0] + X_train[:, 1])
-#     Y = 1. / (1. + np.exp(-(Y + Y)))
-#     Y = Y > 0.5
 
-# TRAIN #
-number_of_samples = 10000
-X_train = np.random.randn(100, 2)
-Y_train = np.tanh(X_train[:, 0] + X_train[:, 1])
-Y_train = 1. / (1. + np.exp(-(Y_train + Y_train)))
-Y_train = Y_train > 0.5
+def generate_data(size):
+    x = np.random.randn(size, 2)
+    y = np.tanh(x[:, 0] + x[:, 1])
+    y = 1. / (1. + np.exp(-(y + y)))
+    y = y > 0.5
 
+    return x, y
+
+
+# Definim variabile
+iterations = 20000
+number_of_samples = 100
+
+# Generam date de antrenare
+X_train, Y_train = generate_data(100)
+
+# Definim reteaua neurala
 w11 = pm.Normal('w11', mu=0., tau=1.)
 w12 = pm.Normal('w12', mu=0., tau=1.)
 w21 = pm.Normal('w21', mu=0., tau=1.)
@@ -35,53 +40,55 @@ def sigmoid(x=w31 * x3 + w32 * x4):
 
 
 y = pm.Bernoulli('y', sigmoid, observed=True, value=Y_train)
+
+# Definim modelul si antrenam
 model = pm.Model([w11, w12, w21, w22, w31, w32, y])
 inference = pm.MCMC(model)
 
-inference.sample(number_of_samples)
+inference.sample(iterations)
 y_pred_train = pm.Bernoulli('y_pred_train', sigmoid)
 
-traces = inference.trace("w11")[:]
-plt.hist(traces)
+# Plotam/afisam valorile posterior pentru W-uri
+w11 = inference.trace("w11")[:]
+plt.hist(w11)
 plt.title('Posterior of w11')
 plt.show()
 
-traces = inference.trace("w12")[:]
-plt.hist(traces)
+w12 = inference.trace("w12")[:]
+plt.hist(w12)
 plt.title('Posterior of w12')
 plt.show()
 
-traces = inference.trace("w21")[:]
-plt.hist(traces)
+w21 = inference.trace("w21")[:]
+plt.hist(w21)
 plt.title('Posterior of w21')
 plt.show()
 
-traces = inference.trace("w22")[:]
-plt.hist(traces)
+w22 = inference.trace("w22")[:]
+plt.hist(w22)
 plt.title('Posterior of w22')
 plt.show()
 
-traces = inference.trace("w31")[:]
-plt.hist(traces)
+w31 = inference.trace("w31")[:]
+plt.hist(w31)
 plt.title('Posterior of w31')
 plt.show()
 
-traces = inference.trace("w32")[:]
-plt.hist(traces)
+w32 = inference.trace("w32")[:]
+plt.hist(w32)
 plt.title('Posterior of w32')
 plt.show()
 
-# TEST #
-X_test = np.random.randn(100, 2)
-Y_test = np.tanh(X_test[:, 0] + X_test[:, 1])
-Y_test = 1. / (1. + np.exp(-(Y_test + Y_test)))
-Y_test = Y_test > 0.5
+# Generam date de test si evaluam
+X_test, Y_test = generate_data(100)
 
 x1 = X_test[:, 0]
 x2 = X_test[:, 1]
 
-inference.sample(number_of_samples)
+inference.sample(iterations)
 y_pred_test = pm.Bernoulli('y_pred_test', sigmoid)
 
-print('Accuracy on train data = {}%'.format((y_pred_train.value == Y_train).mean() * 100))
-print('Accuracy on test data = {}%'.format((y_pred_test.value == Y_test).mean() * 100))
+# Verificam acuratetea pe datele de antrenare si pe datele de test
+print("\nOne sample of weights (w11, w12, w21, w22, w31, w32):\n", w11[-1], w12[-1], w21[-1], w22[-1], w31[-1], w32[-1])
+print("Accuracy on train data = {}".format((y_pred_train.value == Y_train).mean()))
+print("Accuracy on test data = {}".format((y_pred_test.value == Y_test).mean()))
