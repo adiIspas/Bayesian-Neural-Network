@@ -57,8 +57,8 @@ for index in range(iterations):
     l1_delta = l1_error * sigmoid(l1)
 
     # Actualizam w-urile pentru a minimiza eroarea fata de datele de antrenare
-    w_l1 += l1.T.dot(l2_delta)
     w_l0 += l0.T.dot(l1_delta)
+    w_l1 += l1.T.dot(l2_delta)
 
 # Verificam acuratetea
 y_pred = l2
