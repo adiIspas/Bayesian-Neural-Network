@@ -7,11 +7,10 @@ from sklearn.preprocessing import scale
 
 # Definim variabile
 iterations = 2000
-number_of_samples = 100
 
 # Generam date de antrenare si testare
 iris = load_iris()
-X = iris.data[:, :]  # we only take the first two features.
+X = iris.data[:, :]
 Y = iris.target
 
 X = scale(X)
@@ -27,26 +26,33 @@ w22 = pm.Normal('w22', mu=0., tau=1.)
 w31 = pm.Normal('w31', mu=0., tau=1.)
 w32 = pm.Normal('w32', mu=0., tau=1.)
 
+# Folosim doar primele 2 featureuri - sunt suficient de relevante pentru acest dataset
 x1 = X_train[:, 0]
 x2 = X_train[:, 1]
-# x3 = X_train[:, 1]
-# x2 = X_train[:, 1]
+# x3 = X_train[:, 2]
+# x4 = X_train[:, 3]
 
 x3 = pm.Lambda('x3', lambda w1=w11, w2=w12: np.tanh(w1 * x1 + w2 * x2))
 x4 = pm.Lambda('x4', lambda w1=w21, w2=w22: np.tanh(w1 * x1 + w2 * x2))
 
 
 @pm.deterministic
-def sigmoid(x=w31 * x3 + w32 * x4):
+def activation(x=w31 * x3 + w32 * x4):
+    # return np.exp(x) / np.sum(np.exp(x))
     return 1. / (1. + np.exp(-x))
 
 
-y = pm.Container([pm.Categorical('y', sigmoid, observed=True, value=Y_train)])
+y = pm.Container([pm.Categorical('y', activation, observed=True, value=Y_train)])
 
 # Definim modelul si antrenam
 model = pm.Model([w11, w12, w21, w22, w31, w32, y])
 inference = pm.MCMC(model)
 inference.sample(iterations)
+
+y_pred_train = pm.Container([pm.Categorical('y_pred_train', activation)])
+
+# Verificam acuratetea pe datele de antrenare
+print("Accuracy on train data = {}".format((y_pred_train.value == Y_test).mean()))
 
 # Plotam/afisam valorile posterior pentru W-uri
 w11 = inference.trace("w11")[:]
@@ -84,7 +90,10 @@ x2 = X_test[:, 1]
 
 # Evaluam pe datele de test
 inference.sample(iterations)
-y_pred_test = pm.Container([pm.Categorical('y_pred_test', sigmoid)])
+y_pred_test = pm.Container([pm.Categorical('y_pred_test', activation)])
 
 # Verificam acuratetea pe datele de antrenare si pe datele de test
+print("Accuracy on train data = {}".format((y_pred_train.value == Y_test).mean()))
 print("Accuracy on test data = {}".format((y_pred_test.value == Y_test).mean()))
+
+# inference.trace("y")[:]
