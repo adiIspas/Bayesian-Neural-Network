@@ -90,5 +90,5 @@ y_pred_test = pm.Bernoulli('y_pred_test', sigmoid)
 
 # Verificam acuratetea pe datele de antrenare si pe datele de test
 print("\nOne sample of weights (w11, w12, w21, w22, w31, w32):\n", w11[-1], w12[-1], w21[-1], w22[-1], w31[-1], w32[-1])
-print("Accuracy on train data = {}".format((y_pred_train.value == Y_train).mean()))
-print("Accuracy on test data = {}".format((y_pred_test.value == Y_test).mean()))
+print("Accuracy on train data: ", (y_pred_train.value == Y_train).mean())
+print("Accuracy on test data: ", (y_pred_test.value == Y_test).mean())

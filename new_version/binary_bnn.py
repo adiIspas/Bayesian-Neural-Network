@@ -81,5 +81,5 @@ x2 = X_test[:, 1]
 inference.sample(iterations)
 y_pred_test = pm.Bernoulli('y_pred_test', sigmoid)
 
-# Verificam acuratetea pe datele de antrenare si pe datele de test
-print("Accuracy on test data = {}".format((y_pred_test.value == Y_test).mean()))
+# Verificam acuratetea
+print("Accuracy: ", (Y_train == y_pred_test.value).mean())

@@ -11,7 +11,7 @@ def generate_data(size):
 
 
 # Definim variabile
-iterations = 20000
+iterations = 100000
 number_of_samples = 100
 
 # Generam date de antrenare
@@ -23,14 +23,14 @@ def sigmoid(x):
     return 1. / (1. + np.exp(-x))
 
 
-# input dataset
-X = np.array([[0, 0, 1],
-              [0, 1, 1],
-              [1, 0, 1],
-              [1, 1, 1]])
-
-# output dataset
-y = np.array([[0, 0, 1, 1]]).T
+# # input dataset
+# X = np.array([[0, 0, 1],
+#               [0, 1, 1],
+#               [1, 0, 1],
+#               [1, 1, 1]])
+#
+# # output dataset
+# y = np.array([[0, 0, 1, 1]]).T
 
 # seed random numbers to make calculation
 # deterministic (just a good practice)
@@ -49,7 +49,8 @@ w32 = np.random.randn(1, 100)
 x1 = X_train[:, 0]
 x2 = X_train[:, 1]
 
-for iter in range(10000):
+l1 = []
+for _ in range(iterations):
     # forward propagation
     x3 = np.tanh(w11 * x1 + w12 * x2)
     x4 = np.tanh(w21 * x1 + w22 * x2)
@@ -68,9 +69,19 @@ for iter in range(10000):
     w31 += x1 * l1_delta
     w32 += x2 * l1_delta
 
-    # syn0 += np.dot(l0.T, l1_delta)
-
 l1[l1 < 0.5] = 0
 l1[l1 >= 0.5] = 1
-
 print("Accuracy on train data: ", (Y_train == l1).mean())
+
+X_test, Y_test = generate_data(100)
+
+x1 = X_test[:, 0]
+x2 = X_test[:, 1]
+
+x3 = np.tanh(w11 * x1 + w12 * x2)
+x4 = np.tanh(w21 * x1 + w22 * x2)
+
+l1_test = sigmoid(w31 * x3 + w32 * x4)
+l1_test[l1_test < 0.5] = 0
+l1_test[l1_test >= 0.5] = 1
+print("Accuracy on test data: ", (Y_test == l1_test).mean())

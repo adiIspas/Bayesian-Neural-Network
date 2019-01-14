@@ -2,89 +2,67 @@ import numpy as np
 import scipy
 from sklearn.datasets import make_moons
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import scale
 
-X, Y = make_moons(noise=0.2, random_state=0, n_samples=200)
-# X = scale(X)
-# X = X.astype(np.float128)
-# Y = Y.astype(np.float128)
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=.5)
+
+def sigmoid(x, deriv=False):
+    if deriv:
+        return x * (1 - x)
+    return scipy.special.expit(x)  # 1 / (1 + np.exp(-x))
+
+
+# Setam un seed pentru a genera aceleasi rezultate
+# np.random.seed(7)
 
 # Definim variabile
-iterations = 100000
-number_of_samples = 100
+n_samples = 300
+iterations = 10000
+number_of_samples = np.int32(n_samples / 2)
+number_of_features = 2
 
+# Pregatim datele de antrenare/testare
+X_data, Y_data = make_moons(noise=0.2, random_state=0, n_samples=n_samples)
+X_data = scale(X_data)
+X_data = X_data.astype(np.double)
+Y_data = Y_data.astype(np.double)
+X_train, X_test, Y_train, Y_test = train_test_split(X_data, Y_data, test_size=.5)
+Y_train = np.reshape(Y_train, [number_of_samples, 1])
 
-# Generam date de antrenare
-# X_train, Y_train = generate_data(100)
+# Initializam w-urile
+syn0 = 2 * np.random.random((number_of_features, number_of_samples)) - 1
+syn1 = 2 * np.random.random((number_of_samples, 1)) - 1
 
-
-# sigmoid function
-def sigmoid(x):
-    # return 1. / (1. + np.exp(-x))
-    return scipy.special.expit(x)
-
-
-#
-# # input dataset
-# X = np.array([[0, 0, 1],
-#               [0, 1, 1],
-#               [1, 0, 1],
-#               [1, 1, 1]])
-#
-# # output dataset
-# y = np.array([[0, 0, 1, 1]]).T
-
-# seed random numbers to make calculation
-# deterministic (just a good practice)
-# np.random.seed(1)
-
-# initialize weights randomly with mean 0
-# syn0 = 2 * np.random.random((100, 2)) - 1
-
-
-w11 = np.random.randn(1, number_of_samples)
-w12 = np.random.randn(1, number_of_samples)
-w21 = np.random.randn(1, number_of_samples)
-w22 = np.random.randn(1, number_of_samples)
-w31 = np.random.randn(1, number_of_samples)
-w32 = np.random.randn(1, number_of_samples)
-
-x1 = X_train[:, 0]
-x2 = X_train[:, 1]
-
+# Definim cele 3 layere din retea
+l0 = []
 l1 = []
-for _ in range(iterations):
-    # forward propagation
-    x3 = np.tanh(w11 * x1 + w12 * x2)
-    x4 = np.tanh(w21 * x1 + w22 * x2)
+l2 = []
+for index in range(iterations):
 
+    # Primul layer este reprezentat de datele de antrenare
     l0 = X_train
-    l1 = sigmoid(w31 * x3 + w32 * x4)
 
-    l1_error = Y_train - l1
+    # Al doilea/treilea layer este rezultatul functiei sigmoid cu w-urile din primul/al doilea layer
+    l1 = sigmoid(np.dot(l0, syn0))
+    l2 = sigmoid(np.dot(l1, syn1))
 
+    # Calculam eroarea fata de datele de antrenare
+    l2_error = Y_train - l2
+
+    if (index % 1000) == 0:
+        print("Loss:" + str(np.mean(np.abs(l2_error))))
+
+    # Calculam eroarea retelei
+    l2_delta = l2_error * sigmoid(l2)
+    l1_error = l2_delta.dot(syn1.T)
     l1_delta = l1_error * sigmoid(l1)
 
-    w11 += x1 * l1_delta
-    w12 += x2 * l1_delta
-    w21 += x1 * l1_delta
-    w22 += x2 * l1_delta
-    w31 += x1 * l1_delta
-    w32 += x2 * l1_delta
+    # Actualizam w-urile pentru a minimiza eroarea fata de datele de antrenare
+    syn1 += l1.T.dot(l2_delta)
+    syn0 += l0.T.dot(l1_delta)
 
-l1[l1 < 0.5] = 0
-l1[l1 >= 0.5] = 1
-print("Accuracy on train data: ", (Y_train == l1).mean())
+# Verificam acuratetea
+y_pred = l2
+y_pred[y_pred <= 0.5] = 0
+y_pred[y_pred > 0.5] = 1
 
-# X_test, Y_test = generate_data(100)
-
-x1 = X_test[:, 0]
-x2 = X_test[:, 1]
-
-x3 = np.tanh(w11 * x1 + w12 * x2)
-x4 = np.tanh(w21 * x1 + w22 * x2)
-
-l1_test = sigmoid(w31 * x3 + w32 * x4)
-l1_test[l1_test < 0.5] = 0
-l1_test[l1_test >= 0.5] = 1
-print("Accuracy on test data: ", (Y_test == l1_test).mean())
+print("Accuracy: ", (Y_train == y_pred).mean())
