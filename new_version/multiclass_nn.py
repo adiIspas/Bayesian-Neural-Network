@@ -1,6 +1,6 @@
 import numpy as np
 import scipy
-from sklearn.datasets import make_moons
+from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import scale
 
@@ -9,22 +9,26 @@ def sigmoid(x, deriv=False):
     if deriv:
         return x * (1 - x)
     return scipy.special.expit(x)  # 1 / (1 + np.exp(-x))
+    # return scipy.special.expit(x) / np.sum(scipy.special.expit(x))
 
 
 # Setam un seed pentru a genera aceleasi rezultate
-# np.random.seed(7)
+np.random.seed(3721)
 
 # Definim variabile
-n_samples = 300
-iterations = 10000
+n_samples = 150
+iterations = 100000
 number_of_samples = np.int32(n_samples / 2)
 number_of_features = 2
 
 # Pregatim datele de antrenare/testare
-X_data, Y_data = make_moons(noise=0.2, random_state=0, n_samples=n_samples)
+iris = load_iris()
+X_data = iris.data[:, :2]
+Y_data = iris.target
+
 X_data = scale(X_data)
-X_data = X_data.astype(np.double)
-Y_data = Y_data.astype(np.double)
+X_data = X_data.astype(float)
+Y_data = Y_data.astype(float)
 X_train, X_test, Y_train, Y_test = train_test_split(X_data, Y_data, test_size=.5)
 Y_train = np.reshape(Y_train, [number_of_samples, 1])
 
@@ -61,17 +65,19 @@ for index in range(iterations):
     w_l0 += l0.T.dot(l1_delta)
 
 # Verificam acuratetea
-y_pred = l2
-y_pred[y_pred <= 0.5] = 0
-y_pred[y_pred > 0.5] = 1
+y_pred_train = l2
+y_pred_train[y_pred_train <= 3] = 2
+y_pred_train[y_pred_train <= 2] = 1
+y_pred_train[y_pred_train <= 1] = 0
 
 l0 = X_test
 l1 = sigmoid(np.dot(l0, w_l0))
 l2 = sigmoid(np.dot(l1, w_l1))
 
 y_pred_test = l2
-y_pred_test[y_pred_test <= 0.5] = 0
-y_pred_test[y_pred_test > 0.5] = 1
+y_pred_test[y_pred_test <= 3] = 2
+y_pred_test[y_pred_test <= 2] = 1
+y_pred_test[y_pred_test <= 1] = 0
 
-print("Accuracy on train data: ", (Y_train == y_pred).mean())
-print("Accuracy on test data: ", (Y_test == y_pred_test).mean())
+print("Accuracy: ", (Y_train == y_pred_train).mean())
+print("Accuracy: ", (Y_test == y_pred_test).mean())

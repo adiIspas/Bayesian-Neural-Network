@@ -5,12 +5,10 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import scale
 
-# Definim variabile
-iterations = 2000
 
-# Generam date de antrenare si testare
+iterations = 2000
 iris = load_iris()
-X = iris.data[:, :]
+X = iris.data[:, :2]
 Y = iris.target
 
 X = scale(X)
@@ -18,7 +16,6 @@ X = X.astype(float)
 Y = Y.astype(float)
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=.5)
 
-# Definim arhitectura retelei
 w11 = pm.Normal('w11', mu=0., tau=1.)
 w12 = pm.Normal('w12', mu=0., tau=1.)
 w21 = pm.Normal('w21', mu=0., tau=1.)
@@ -26,7 +23,6 @@ w22 = pm.Normal('w22', mu=0., tau=1.)
 w31 = pm.Normal('w31', mu=0., tau=1.)
 w32 = pm.Normal('w32', mu=0., tau=1.)
 
-# Folosim doar primele 2 featureuri - sunt suficient de relevante pentru acest dataset
 x1 = X_train[:, 0]
 x2 = X_train[:, 1]
 # x3 = X_train[:, 2]
@@ -38,21 +34,16 @@ x4 = pm.Lambda('x4', lambda w1=w21, w2=w22: np.tanh(w1 * x1 + w2 * x2))
 
 @pm.deterministic
 def activation(x=w31 * x3 + w32 * x4):
-    # return np.exp(x) / np.sum(np.exp(x))
-    return 1. / (1. + np.exp(-x))
+    return 1. / (1. + np.exp(-x))  # sigmoid
 
 
 y = pm.Container([pm.Categorical('y', activation, observed=True, value=Y_train)])
 
-# Definim modelul si antrenam
 model = pm.Model([w11, w12, w21, w22, w31, w32, y])
 inference = pm.MCMC(model)
 inference.sample(iterations)
 
 y_pred_train = pm.Container([pm.Categorical('y_pred_train', activation)])
-
-# Verificam acuratetea pe datele de antrenare
-print("Accuracy on train data = {}".format((y_pred_train.value == Y_test).mean()))
 
 # Plotam/afisam valorile posterior pentru W-uri
 w11 = inference.trace("w11")[:]
@@ -90,10 +81,9 @@ x2 = X_test[:, 1]
 
 # Evaluam pe datele de test
 inference.sample(iterations)
-y_pred_test = pm.Container([pm.Categorical('y_pred_test', activation)])
+y_pred_test = pm.Categorical('y_pred_test', activation)
 
 # Verificam acuratetea pe datele de antrenare si pe datele de test
-print("Accuracy on train data = {}".format((y_pred_train.value == Y_test).mean()))
+print("Accuracy on train data = {}".format((y_pred_train.value == Y_train).mean()))
 print("Accuracy on test data = {}".format((y_pred_test.value == Y_test).mean()))
 
-# inference.trace("y")[:]

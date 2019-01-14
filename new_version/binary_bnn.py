@@ -43,6 +43,8 @@ model = pm.Model([w11, w12, w21, w22, w31, w32, y])
 inference = pm.MCMC(model)
 inference.sample(iterations)
 
+y_pred_train = pm.Bernoulli('y_pred_train', sigmoid)
+
 # Plotam/afisam valorile posterior pentru W-uri
 w11 = inference.trace("w11")[:]
 plt.hist(w11)
@@ -82,4 +84,5 @@ inference.sample(iterations)
 y_pred_test = pm.Bernoulli('y_pred_test', sigmoid)
 
 # Verificam acuratetea
-print("Accuracy: ", (Y_train == y_pred_test.value).mean())
+print("Accuracy on train data: ", (Y_train == y_pred_train.value).mean())
+print("Accuracy on test data: ", (Y_test == y_pred_test.value).mean())
