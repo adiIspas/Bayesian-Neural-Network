@@ -43,7 +43,11 @@ model = pm.Model([w11, w12, w21, w22, w31, w32, y])
 inference = pm.MCMC(model)
 inference.sample(iterations)
 
-y_pred_train = pm.Container([pm.Categorical('y_pred_train', activation)])
+# y_pred_train = pm.Container([pm.Categorical('y_pred_train', activation)])
+y_pred_train = pm.Container(
+    [pm.Categorical("y_pred_train_%s" % i,
+                    p=pm.Lambda("phi_z_%s_%s" % (d, i), lambda z=self.Z[d][i], phi=self.phi: phi[z]),
+                    value=self.data[d][i], observed=True) for i in range(0, 75)])
 
 # Plotam/afisam valorile posterior pentru W-uri
 w11 = inference.trace("w11")[:]

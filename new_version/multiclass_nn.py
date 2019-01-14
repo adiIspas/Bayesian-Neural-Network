@@ -79,5 +79,5 @@ y_pred_test[y_pred_test <= 3] = 2
 y_pred_test[y_pred_test <= 2] = 1
 y_pred_test[y_pred_test <= 1] = 0
 
-print("Accuracy: ", (Y_train == y_pred_train).mean())
-print("Accuracy: ", (Y_test == y_pred_test).mean())
+print("Accuracy on train data: ", (Y_train == y_pred_train).mean())
+print("Accuracy on test data: ", (Y_test == y_pred_test).mean())
